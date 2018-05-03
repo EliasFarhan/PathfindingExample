@@ -14,8 +14,8 @@ public class Follower : MonoBehaviour
 {
 
 	[SerializeField] private FollowerMovement followerMovement = FollowerMovement.Lerp;
-	private Rigidbody2D m_Body;
-	private PlayerCharacter pChar = null;
+	protected Rigidbody2D m_Body;
+	protected PlayerCharacter pChar = null;
 	[SerializeField]
 	private float speed = 4.0f;
 	[SerializeField]

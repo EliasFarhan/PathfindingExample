@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public enum ResultType
 {
@@ -10,25 +11,36 @@ public enum ResultType
 }
 
 
+[System.Serializable]
 public class BehaviorTree
 {
 	private Dictionary<string, object> data = new Dictionary<string, object>();
+	[SerializeField]
 	private Leaf topOfTree = null;
 
 	public BehaviorTree(Leaf top)
 	{
 		topOfTree = top;
+	}
+
+	public void Init()
+	{
 		topOfTree.Init(this);
 	}
 
+	public void Process()
+	{
+		Debug.Log("BT PROCESS");
+		topOfTree.Process();
+	}
 	public Dictionary<string, object> Data
 	{
 		get { return data; }
 		set { data = value; }
 	}
 }
-
-public abstract class Leaf
+[System.Serializable]
+public abstract class Leaf 
 {
 	protected BehaviorTree bt;
 	public Leaf()
@@ -43,9 +55,11 @@ public abstract class Leaf
 	public abstract ResultType Process();
 }
 
+[System.Serializable]
 public abstract class Node : Leaf
 {
-	protected List<Leaf> children = new List<Node>();
+	[SerializeField]
+	protected List<Leaf> children = new List<Leaf>();
 	public Node(params Leaf[] nodes)
 	{
 		foreach (var newNode in nodes)
@@ -64,6 +78,7 @@ public abstract class Node : Leaf
 	}
 }
 
+[System.Serializable]
 public class Sequencer : Node
 {
 	private int index = 0;
@@ -94,6 +109,7 @@ public class Sequencer : Node
 	}
 }
 
+[System.Serializable]
 public class Selector : Node
 {
 	private int index = 0;
@@ -123,15 +139,26 @@ public class Selector : Node
 	}
 }
 
+[System.Serializable]
 public abstract class Decorator : Leaf
 {
+	[SerializeField]
 	protected Leaf child;
 
 	public Decorator(Leaf child)
 	{
 		this.child = child;
 	}
+
+	public override void Init(BehaviorTree bt)
+	{
+		base.Init(bt);
+		child.Init(bt);
+	}
 }
+
+
+[System.Serializable]
 public class Repeater : Decorator
 {
 	public override ResultType Process()
@@ -145,6 +172,7 @@ public class Repeater : Decorator
 	}
 }
 
+[System.Serializable]
 public class RepeatUntilFail : Decorator
 {
 	public override ResultType Process()
@@ -163,6 +191,7 @@ public class RepeatUntilFail : Decorator
 	}
 }
 
+[System.Serializable]
 public class Inverter : Decorator
 {
 	public override ResultType Process()
